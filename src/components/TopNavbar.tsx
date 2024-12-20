@@ -1,11 +1,21 @@
 import React, { useState } from "react";
-import { Menu, X, Gift, Shirt, Watch, Scissors, ShoppingBag, Phone, ChevronDown, ChevronUp, ShoppingCart } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import {
+  Menu,
+  X,
+  Gift,
+  Shirt,
+  Watch,
+  Scissors,
+  ShoppingBag,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
 import StoreLocationsModal from "./StoreLocationsModal";
 import ContactModal from "./ContactModal";
-import { useCart } from "./cart/CartProvider";
 
+// Menu Items with subitems
 const menuItems = [
   {
     title: "Le monde Fiori",
@@ -15,8 +25,8 @@ const menuItems = [
       { href: "/category/le-monde-fiori/printemps", title: "Collections Printemps" },
       { href: "/category/le-monde-fiori/ete", title: "Collections Été" },
       { href: "/category/le-monde-fiori/mariage", title: "Marriage" },
-      { href: "/category/le-monde-fiori/soiree", title: "Soirée" }
-    ]
+      { href: "/category/le-monde-fiori/soiree", title: "Soirée" },
+    ],
   },
   {
     title: "L'univers Cadeaux",
@@ -28,8 +38,8 @@ const menuItems = [
       { href: "/category/univers-cadeaux/pack-trio", title: "Pack Trio" },
       { href: "/category/univers-cadeaux/pack-duo", title: "Pack Duo" },
       { href: "/category/univers-cadeaux/pack-mini-duo", title: "Pack Mini Duo" },
-      { href: "/category/univers-cadeaux/pack-mono", title: "Pack Mono" }
-    ]
+      { href: "/category/univers-cadeaux/pack-mono", title: "Pack Mono" },
+    ],
   },
   {
     title: "Le prêt à porter",
@@ -40,8 +50,8 @@ const menuItems = [
       { href: "/category/pret-a-porter/homme/blazers", title: "Blazers" },
       { href: "/category/pret-a-porter/homme/chemises", title: "Chemises" },
       { href: "/category/pret-a-porter/homme/pulls", title: "Pulls" },
-      { href: "/category/pret-a-porter/homme/pantalons", title: "Pantalons" }
-    ]
+      { href: "/category/pret-a-porter/homme/pantalons", title: "Pantalons" },
+    ],
   },
   {
     title: "Accessoires",
@@ -51,19 +61,19 @@ const menuItems = [
       { href: "/category/accessoires/homme/portefeuilles", title: "Portefeuilles" },
       { href: "/category/accessoires/homme/ceintures", title: "Ceintures" },
       { href: "/category/accessoires/homme/cravates", title: "Cravates" },
-      { href: "/category/accessoires/homme/mallettes", title: "Mallettes" }
-    ]
+      { href: "/category/accessoires/homme/mallettes", title: "Mallettes" },
+    ],
   },
   {
     title: "Sur mesure",
     icon: Scissors,
-    link: "/category/sur-mesure"
+    link: "/category/sur-mesure",
   },
   {
     title: "Outlet",
     icon: ShoppingBag,
-    link: "/category/outlet"
-  }
+    link: "/category/outlet",
+  },
 ];
 
 const TopNavbar = () => {
@@ -71,9 +81,6 @@ const TopNavbar = () => {
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-  
-  const { cartCount } = useCart();
-  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -115,55 +122,72 @@ const TopNavbar = () => {
             >
               CONTACTEZ-NOUS
             </button>
-            
-            <button
-              onClick={() => navigate('/cart')}
-              className="text-sm text-white whitespace-nowrap hover:text-red-500 transition-colors duration-300 relative"
-            >
-              <ShoppingCart size={24} />
-              {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-            </button>
           </div>
         </div>
       </nav>
 
       <div
-        className={`fixed top-0 left-0 h-full bg-[#700100]/40 backdrop-blur-md shadow-2xl transform ${
+        className={`fixed top-0 left-0 h-full bg-[#700100]/80 backdrop-blur-md shadow-2xl transform ${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-500 ease-in-out z-50 w-80 overflow-y-auto`}
+        } transition-transform duration-500 ease-in-out z-50 w-80`}
       >
-        <div className="flex flex-col p-4">
+        <div className="flex items-center justify-between p-6 border-b border-red-300/50">
+          <h2 className="text-2xl font-semibold text-white tracking-wider">Menu</h2>
+          <button
+            onClick={toggleMenu}
+            aria-label="Close menu"
+            className="text-white hover:text-red-400"
+          >
+            <X size={28} />
+          </button>
+        </div>
+        <ul className="p-6 space-y-8">
           {menuItems.map((item) => (
-            <div key={item.title} className="relative">
-              <Link to={item.link} className="flex items-center justify-between p-2 text-white hover:bg-red-500 transition-colors">
-                <span>{item.title}</span>
+            <li key={item.title} className="text-white">
+              <div
+                className="flex items-center gap-4 cursor-pointer hover:text-red-400 transition-colors duration-300"
+                onClick={() => item.subItems && toggleSubmenu(item.title)}
+              >
+                <item.icon size={28} />
+                <Link to={item.link} className="text-lg font-medium hover:text-red-500 transition-colors">
+                  {item.title}
+                </Link>
                 {item.subItems && (
-                  <button onClick={() => toggleSubmenu(item.title)} className="text-white">
-                    {expandedItem === item.title ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                  </button>
+                  <span className="ml-auto">
+                    {expandedItem === item.title ? (
+                      <ChevronUp size={20} />
+                    ) : (
+                      <ChevronDown size={20} />
+                    )}
+                  </span>
                 )}
-              </Link>
+              </div>
               {item.subItems && expandedItem === item.title && (
-                <ul className="ml-4">
+                <ul className="ml-8 mt-2 space-y-2">
                   {item.subItems.map((subItem) => (
-                    <li key={subItem.href}>
-                      <Link to={subItem.href} className="block text-white hover:text-red-400 transition-colors">
+                    <li key={subItem.href} className="hover:text-red-400">
+                      <Link
+                        to={subItem.href}
+                        className="text-sm hover:text-red-500 transition-colors"
+                      >
                         {subItem.title}
                       </Link>
                     </li>
                   ))}
                 </ul>
               )}
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={toggleMenu}
+        ></div>
+      )}
 
-      <StoreLocationsModal 
+      <StoreLocationsModal
         isOpen={isStoreModalOpen}
         onOpenChange={setIsStoreModalOpen}
       />
