@@ -10,12 +10,13 @@ import {
   ShoppingBag,
   ChevronDown,
   ChevronUp,
+  Phone,
+  MapPin,
 } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
 import StoreLocationsModal from "./StoreLocationsModal";
 import ContactModal from "./ContactModal";
 
-// Menu Items with subitems
 const menuItems = [
   {
     title: "Le monde Fiori",
@@ -98,7 +99,7 @@ const TopNavbar = () => {
           <div className="flex items-center gap-4 w-full sm:w-auto">
             <button
               onClick={toggleMenu}
-              className="lg:hidden text-white hover:text-red-500 transition-colors duration-300 -ml-6"
+              className="lg:hidden text-white hover:text-accent transition-colors duration-300 -ml-6"
               aria-label="Toggle menu"
             >
               {isOpen ? (
@@ -110,79 +111,93 @@ const TopNavbar = () => {
 
             <button
               onClick={() => setIsStoreModalOpen(true)}
-              className="text-sm text-white whitespace-nowrap hover:text-red-500 transition-colors duration-300"
+              className="flex items-center gap-2 text-sm text-white whitespace-nowrap hover:text-accent transition-colors duration-300"
             >
+              <MapPin size={18} />
               TROUVER UNE BOUTIQUE
             </button>
           </div>
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsContactModalOpen(true)}
-              className="text-sm text-white whitespace-nowrap hover:text-red-500 transition-colors duration-300 mb-2 sm:mb-0 hidden sm:block"
+              className="flex items-center gap-2 text-sm text-white whitespace-nowrap hover:text-accent transition-colors duration-300 mb-2 sm:mb-0 hidden sm:flex"
             >
+              <Phone size={18} />
               CONTACTEZ-NOUS
             </button>
           </div>
         </div>
       </nav>
 
+      {/* Enhanced Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full bg-[#700100]/80 backdrop-blur-md shadow-2xl transform ${
+        className={`fixed top-0 left-0 h-full bg-gradient-to-br from-[#700100] via-[#8B0000] to-[#700100] backdrop-blur-lg shadow-2xl transform ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-500 ease-in-out z-50 w-80`}
       >
-        <div className="flex items-center justify-between p-6 border-b border-red-300/50">
+        <div className="flex items-center justify-between p-6 border-b border-white/10">
           <h2 className="text-2xl font-semibold text-white tracking-wider">Menu</h2>
           <button
             onClick={toggleMenu}
             aria-label="Close menu"
-            className="text-white hover:text-red-400"
+            className="text-white hover:text-accent transition-colors duration-300"
           >
             <X size={28} />
           </button>
         </div>
-        <ul className="p-6 space-y-8">
-          {menuItems.map((item) => (
-            <li key={item.title} className="text-white">
-              <div
-                className="flex items-center gap-4 cursor-pointer hover:text-red-400 transition-colors duration-300"
-                onClick={() => item.subItems && toggleSubmenu(item.title)}
-              >
-                <item.icon size={28} />
-                <Link to={item.link} className="text-lg font-medium hover:text-red-500 transition-colors">
-                  {item.title}
-                </Link>
-                {item.subItems && (
-                  <span className="ml-auto">
-                    {expandedItem === item.title ? (
-                      <ChevronUp size={20} />
-                    ) : (
-                      <ChevronDown size={20} />
-                    )}
-                  </span>
-                )}
-              </div>
-              {item.subItems && expandedItem === item.title && (
-                <ul className="ml-8 mt-2 space-y-2">
-                  {item.subItems.map((subItem) => (
-                    <li key={subItem.href} className="hover:text-red-400">
-                      <Link
-                        to={subItem.href}
-                        className="text-sm hover:text-red-500 transition-colors"
+        
+        <div className="overflow-y-auto h-[calc(100vh-5rem)]">
+          <ul className="p-6 space-y-6">
+            {menuItems.map((item) => (
+              <li key={item.title} className="text-white">
+                <div
+                  className="group flex items-center gap-4 cursor-pointer hover:text-accent transition-all duration-300 p-3 rounded-lg hover:bg-white/5"
+                  onClick={() => item.subItems && toggleSubmenu(item.title)}
+                >
+                  <item.icon className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />
+                  <Link 
+                    to={item.link} 
+                    className="text-lg font-medium flex-1 group-hover:translate-x-1 transition-transform duration-300"
+                  >
+                    {item.title}
+                  </Link>
+                  {item.subItems && (
+                    <span className="ml-auto transition-transform duration-300">
+                      {expandedItem === item.title ? (
+                        <ChevronUp size={20} />
+                      ) : (
+                        <ChevronDown size={20} />
+                      )}
+                    </span>
+                  )}
+                </div>
+                {item.subItems && expandedItem === item.title && (
+                  <ul className="ml-8 mt-2 space-y-2 animate-accordion-down">
+                    {item.subItems.map((subItem) => (
+                      <li 
+                        key={subItem.href}
+                        className="relative"
                       >
-                        {subItem.title}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          ))}
-        </ul>
+                        <Link
+                          to={subItem.href}
+                          className="block text-sm py-2 px-4 hover:text-accent transition-colors duration-300 hover:bg-white/5 rounded-md relative pl-6"
+                        >
+                          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-accent/50"></span>
+                          {subItem.title}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
+
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
           onClick={toggleMenu}
         ></div>
       )}
