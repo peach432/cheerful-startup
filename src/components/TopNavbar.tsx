@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { Menu, X, Gift, Shirt, Watch, Scissors, ShoppingBag, Phone, ChevronDown, ChevronUp, ShoppingCart } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import LanguageSwitcher from "./LanguageSwitcher";
 import StoreLocationsModal from "./StoreLocationsModal";
 import ContactModal from "./ContactModal";
-import CartModal from "./cart/CartModal";
 import { useCart } from "./cart/CartProvider";
 
 const menuItems = [
@@ -72,9 +71,9 @@ const TopNavbar = () => {
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   
-  const { cartItems, removeFromCart, updateQuantity, cartCount } = useCart();
+  const { cartCount } = useCart();
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -118,7 +117,7 @@ const TopNavbar = () => {
             </button>
             
             <button
-              onClick={() => setIsCartModalOpen(true)}
+              onClick={() => navigate('/cart')}
               className="text-sm text-white whitespace-nowrap hover:text-red-500 transition-colors duration-300 relative"
             >
               <ShoppingCart size={24} />
@@ -172,14 +171,6 @@ const TopNavbar = () => {
       <ContactModal
         isOpen={isContactModalOpen}
         onOpenChange={setIsContactModalOpen}
-      />
-
-      <CartModal
-        isOpen={isCartModalOpen}
-        onOpenChange={setIsCartModalOpen}
-        cartItems={cartItems}
-        removeFromCart={removeFromCart}
-        updateQuantity={updateQuantity}
       />
     </div>
   );
