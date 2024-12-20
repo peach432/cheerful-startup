@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { Menu, X, Gift, Shirt, Watch, Scissors, ShoppingBag, Phone, ChevronDown, ChevronUp } from "lucide-react";
+import { Menu, X, Gift, Shirt, Watch, Scissors, ShoppingBag, Phone, ChevronDown, ChevronUp, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import LanguageSwitcher from "./LanguageSwitcher";
 import StoreLocationsModal from "./StoreLocationsModal";
 import ContactModal from "./ContactModal";
+import CartModal from "./cart/CartModal";
+import { useCart } from "./cart/CartProvider";
 
 const menuItems = [
   {
@@ -70,6 +72,9 @@ const TopNavbar = () => {
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+  
+  const { cartItems, removeFromCart, updateQuantity, cartCount } = useCart();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -111,8 +116,19 @@ const TopNavbar = () => {
             >
               CONTACTEZ-NOUS
             </button>
-{/*             <LanguageSwitcher />
- */}          </div>
+            
+            <button
+              onClick={() => setIsCartModalOpen(true)}
+              className="text-sm text-white whitespace-nowrap hover:text-red-500 transition-colors duration-300 relative"
+            >
+              <ShoppingCart size={24} />
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -147,12 +163,6 @@ const TopNavbar = () => {
           ))}
         </div>
       </div>
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
-          onClick={toggleMenu}
-        ></div>
-      )}
 
       <StoreLocationsModal 
         isOpen={isStoreModalOpen}
@@ -162,6 +172,14 @@ const TopNavbar = () => {
       <ContactModal
         isOpen={isContactModalOpen}
         onOpenChange={setIsContactModalOpen}
+      />
+
+      <CartModal
+        isOpen={isCartModalOpen}
+        onOpenChange={setIsCartModalOpen}
+        cartItems={cartItems}
+        removeFromCart={removeFromCart}
+        updateQuantity={updateQuantity}
       />
     </div>
   );
