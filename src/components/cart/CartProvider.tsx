@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useTransition } from 'react';
 
 interface CartItem {
   id: number;
@@ -20,29 +20,36 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isPending, startTransition] = useTransition();
 
   const addToCart = useCallback((item: Omit<CartItem, 'quantity'>) => {
-    setCartItems(prev => {
-      const existingItem = prev.find(i => i.id === item.id);
-      if (existingItem) {
-        return prev.map(i =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-        );
-      }
-      return [...prev, { ...item, quantity: 1 }];
+    startTransition(() => {
+      setCartItems(prev => {
+        const existingItem = prev.find(i => i.id === item.id);
+        if (existingItem) {
+          return prev.map(i =>
+            i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+          );
+        }
+        return [...prev, { ...item, quantity: 1 }];
+      });
     });
   }, []);
 
   const removeFromCart = useCallback((id: number) => {
-    setCartItems(prev => prev.filter(item => item.id !== id));
+    startTransition(() => {
+      setCartItems(prev => prev.filter(item => item.id !== id));
+    });
   }, []);
 
   const updateQuantity = useCallback((id: number, quantity: number) => {
-    setCartItems(prev =>
-      prev.map(item =>
-        item.id === id ? { ...item, quantity } : item
-      )
-    );
+    startTransition(() => {
+      setCartItems(prev =>
+        prev.map(item =>
+          item.id === id ? { ...item, quantity } : item
+        )
+      );
+    });
   }, []);
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
